@@ -1,0 +1,14 @@
+    dna_sequence_1 = ["A", "C", "G", "T"]
+    dna_sequence_2 = ["A", "C", "G", "C"]
+
+    dna_sequence_1 = ["C", "A", "C", "G", "T"]
+    dna_sequence_2 = ["A", "C", "C", "C"]
+
+    dna_sequence_1 = ["C", "A", "C", "G"]
+    dna_sequence_2 = ["T", "G", "A", "C", "C"]
+
+    dna_sequence_1 = ["C", "A", "T", "G"]
+    dna_sequence_2 = ["C", "A", "G"]
+
+    dna_sequence_1 = ["C", "A", "C", "G", "C", "G"]
+    dna_sequence_2 = ["T", "C", "A", "C", "C", "G"]

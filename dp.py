@@ -6,9 +6,9 @@ import numpy as np
 def main():
 
     # Values to send to the Class
-    delta = 0
-    pair_score = 3
-    non_pair_score = 1
+    delta = 4
+    pair_score = 10
+    non_pair_score = 0
     sigma = np.asarray([[pair_score, non_pair_score, non_pair_score, non_pair_score],
                         [non_pair_score, pair_score, non_pair_score, non_pair_score],
                         [non_pair_score, non_pair_score, pair_score, non_pair_score],
@@ -59,7 +59,7 @@ class PairwiseAlignment():
         dna_sequence_1 = self.dna_sequence_1[:]
         dna_sequence_2 = self.dna_sequence_2[:]
 
-        # Get the actions to produce the optimal alignment
+        # Get the actions to produce the optimal alignment and the corresponding score
         score, actions = self.get_score_and_actions_from_dp(self.dna_sequence_1, self.dna_sequence_2)
 
         # Iterate for each action
@@ -155,9 +155,12 @@ class PairwiseAlignment():
             # Create an array of actions that maximize the value 
             max_actions = [action for action, value in action_values.items() if value[0] == max_value]
 
+            # Get the maximum action; uses the last action in the array to prioritize match actions
+            max_action = max_actions[-1]
+
             # Use the previous actions list from the current maximum action and add the maximum action to the running list
-            max_prev_actions = action_values[max_actions[-1]][1]
-            max_prev_actions.append(max_actions[-1])
+            max_prev_actions = action_values[max_action][1]
+            max_prev_actions.append(max_action)
 
             return max_value, max_prev_actions
 

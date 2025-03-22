@@ -12,3 +12,6 @@
 
     dna_sequence_1 = ["C", "A", "C", "G", "C", "G"]
     dna_sequence_2 = ["T", "C", "A", "C", "C", "G"]
+
+    dna_sequence_1 = ["C", "A", "C", "G", "C", "G"]
+    dna_sequence_2 = ["C", "A", "C", "C", "G"]

@@ -6,9 +6,10 @@ import numpy as np
 def main():
 
     # Values to send to the Class
-    delta = 0
-    pair_score = 3
-    non_pair_score = 1
+    alpha = 0   # 0/4
+    beta = 4
+    pair_score = 10
+    non_pair_score = 2.5   # 2.5/0
     sigma = np.asarray([[pair_score, non_pair_score, non_pair_score, non_pair_score],
                         [non_pair_score, pair_score, non_pair_score, non_pair_score],
                         [non_pair_score, non_pair_score, pair_score, non_pair_score],
@@ -17,7 +18,7 @@ def main():
     dna_sequence_2 = ["T", "C", "A", "C", "C", "G"]
     
     # Instantiate the Class with the variables from above
-    pairwise_alignment = PairwiseAlignment(sigma, delta, dna_sequence_1, dna_sequence_2)
+    pairwise_alignment = PairwiseAlignment(sigma, alpha, beta, dna_sequence_1, dna_sequence_2)
     
     # Call the pairwise_alignment function to align the DNA sequences
     optimal_alignment, optimal_score, optimal_actions = pairwise_alignment.pairwise_alignment()
@@ -26,24 +27,26 @@ def main():
     print("\033[1mInputs\033[0m")
     print(f"DNA Sequence 1: {''.join(dna_sequence_1)}")
     print(f"DNA Sequence 2: {''.join(dna_sequence_2)}")
-    print(f"Delta: {delta}")
+    print(f"Alpha: {alpha}")
+    print(f"Delta: {beta}")
     print(f"Sigma:")
     for row in sigma:
         print(" ".join(f"{val:3}" for val in row))
     print("\n")
-    print(f"\033[1mPairwise Alignment\033[0m\n{optimal_alignment}\n")
-    print(f"\033[1mPairwise Alignment Score\033[0m\n{optimal_score}\n")
-    print(f"\033[1mActions for Pairwise Alignment\033[0m\n{', '.join(optimal_actions)}")
+    print(f"\033[1mPairwise Alignment with Affine Gap Penalty\033[0m\n{optimal_alignment}\n")
+    print(f"\033[1mPairwise Alignment Score with Affine Gap Penalty\033[0m\n{optimal_score}\n")
+    print(f"\033[1mActions for Pairwise Alignment with Affine Gap Penalty\033[0m\n{', '.join(optimal_actions)}")
 
 
 # Class Definition for the Pairwise Alignment functions
 class PairwiseAlignment():
     
     
-    # Init function that globalizes the delta, sigma_array, and dna_sequence variables
-    def __init__(self, sigma_array: np.array, delta: int, dna_sequence_1: list, dna_sequence_2: list):
+    # Init function that globalizes the sigma_array, alpha, beta, and dna_sequence variables
+    def __init__(self, sigma_array: np.array, alpha: int, beta: int, dna_sequence_1: list, dna_sequence_2: list):
         
-        self.delta = delta
+        self.alpha = alpha
+        self.beta = beta
         self.sigma_array = sigma_array
         self.dna_sequence_1 = dna_sequence_1
         self.dna_sequence_2 = dna_sequence_2
@@ -59,7 +62,7 @@ class PairwiseAlignment():
         dna_sequence_1 = self.dna_sequence_1[:]
         dna_sequence_2 = self.dna_sequence_2[:]
 
-        # Get the actions to produce the optimal alignment
+        # Get the actions to produce the optimal alignment and the corresponding score
         score, actions = self.get_score_and_actions_from_dp(self.dna_sequence_1, self.dna_sequence_2)
 
         # Iterate for each action
@@ -110,8 +113,8 @@ class PairwiseAlignment():
             # Logic for when there are remaining terms in the first DNA sequence
             if dna_size_1 != 0:
 
-                # Calculate the score by multiplying the score of a deletion by the number of DNA terms remaining
-                base_case_score = self.delta * dna_size_1
+                # Calculate the score of the base case using the remaining DNA terms
+                base_case_score = self.alpha + self.beta * (dna_size_1 - 1)
 
                 # Generate the action array by adding a deletion action for each DNA term remaining 
                 for _ in range(dna_size_1):
@@ -120,8 +123,8 @@ class PairwiseAlignment():
             # Logic for when there are remaining terms in the second DNA sequence
             elif dna_size_2 != 0:
 
-                # Calculate the score by multiplying the score of a insertion by the number of DNA terms remaining
-                base_case_score = self.delta * dna_size_2
+                # Calculate the score of the base case using the remaining DNA terms
+                base_case_score = self.alpha + self.beta * (dna_size_2 - 1)
 
                 # Generate the action array by adding an insertion action for each DNA term remaining 
                 for _ in range(dna_size_2):
@@ -136,28 +139,77 @@ class PairwiseAlignment():
             recursive_dna_sequence_1 = dna_sequence_1[:-1]
             recursive_dna_sequence_2 = dna_sequence_2[:-1]
 
-            # Use recursion to calculate the maximum pairwise alignment for the DNA sequences produced by taking each action
-            recursive_deletion, deletion_prev_actions = self.get_score_and_actions_from_dp(recursive_dna_sequence_1, dna_sequence_2)
-            recursive_insertion, insertion_prev_actions = self.get_score_and_actions_from_dp(dna_sequence_1 , recursive_dna_sequence_2)
+            # Use recursion to calculate the maximum pairwise alignment for a match on the recursive DNA sequences
             recursive_match, match_prev_actions = self.get_score_and_actions_from_dp(recursive_dna_sequence_1, recursive_dna_sequence_2)
-            
-            # Calculate the values of the deletion, insertion, and match actions by adding the delta or sigma value
-            deletion = recursive_deletion + self.delta
-            insertion = recursive_insertion + self.delta
+
+            # Calculate the value of the match by adding the sigma value
             match = recursive_match + self.compute_sigma(dna_sequence_1[-1], dna_sequence_2[-1])
+
+            # Define lists to hold the scores and previous actions of each iterative insertion
+            insertions = []
+            insertions_prev_actions = []
+
+            # Iterate for the possible number of consecutive insertion actions
+            for k in range(1, (dna_size_2 + 1)):
+
+                # Get the recurisve DNA sequence by cutting off the number of terms equal to the number of consecutive insertions
+                recursive_dna_sequence_2 = dna_sequence_2[:-k]
+
+                # Use recursion to calculate the maximum pairwise alignment for an insertion on the resulting DNA sequences
+                recursive_insertion, insertion_prev_actions = self.get_score_and_actions_from_dp(dna_sequence_1 , recursive_dna_sequence_2)
+                
+                # Calculate the value of the current insertion action 
+                insertion = recursive_insertion + self.alpha + self.beta * (k - 1)
+
+                # Insert the current insertion value and previous actions to their respective lists
+                insertions.append(insertion)
+                insertions_prev_actions.append(insertion_prev_actions)
+
+            # Find the maximum insertion action and the corresponding score, index, and previous actions list
+            max_insertion_score = max(insertions[::-1])
+            max_insertion_k_value = insertions.index(max_insertion_score)
+            max_insertion_prev_actions = insertions_prev_actions[max_insertion_k_value]
+
+            # Define lists to hold the scores and previous actions of each iterative deletion
+            deletions = []
+            deletions_prev_actions = []
+            
+            # Iterate for the possible number of consecutive deletion actions
+            for k in range(1, (dna_size_1 + 1)):
+
+                # Get the recursive DNA sequence by cutting off the number of terms equal to the number of consecutive deletions
+                recursive_dna_sequence_1 = dna_sequence_1[:-k]
+
+                # Use recursion to calculate the maximum pairwise alignment for a deletion on the resulting DNA sequences
+                recursive_deletion, deletion_prev_actions = self.get_score_and_actions_from_dp(recursive_dna_sequence_1, dna_sequence_2)
+
+                # Calculate the value of the current deletion action 
+                deletion = recursive_deletion + self.alpha + self.beta * (k - 1)
+                
+                # Insert the current deletion value and previous actions to their respective lists
+                deletions.append(deletion)
+                deletions_prev_actions.append(deletion_prev_actions)
+
+            # Find the maximum deletion action and the corresponding score, index, and previous actions list
+            max_deletion_score = max(deletions[::-1])
+            max_deletion_k_value = deletions.index(max_deletion_score)
+            max_deletion_prev_actions = deletions_prev_actions[max_deletion_k_value]
             
             # Find the maximum action
-            max_value = max(deletion, insertion, match)
+            max_value = max(match, max_deletion_score, max_insertion_score)
             
             # Define a set of the actions with their corresponding values and previous action lists for the current recursion
-            action_values = {"deletion": [deletion, deletion_prev_actions], "insertion": [insertion, insertion_prev_actions], "match": [match, match_prev_actions]}
+            action_values = {"deletion": [max_deletion_score, max_deletion_prev_actions], "insertion": [max_insertion_score, max_insertion_prev_actions], "match": [match, match_prev_actions]}
             
             # Create an array of actions that maximize the value 
             max_actions = [action for action, value in action_values.items() if value[0] == max_value]
 
+            # Get the maximum action; uses the last action in the array to prioritize match actions
+            max_action = max_actions[-1]
+
             # Use the previous actions list from the current maximum action and add the maximum action to the running list
-            max_prev_actions = action_values[max_actions[-1]][1]
-            max_prev_actions.append(max_actions[-1])
+            max_prev_actions = action_values[max_action][1]
+            max_prev_actions.append(max_action)
 
             return max_value, max_prev_actions
 

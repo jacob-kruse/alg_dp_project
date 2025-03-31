@@ -8,7 +8,7 @@ This package includes all of the code for my Pairwise Alignment Dynamic Programm
 
 The project description is located in the `/docs` folder of this repository, and can be viewed at the link below.
 
-[View Project Description PDF](https://jacob-kruse.github.io/alg_dp_project/docs/Project_Description.pdf)
+[View Project Description PDF](https://jacob-kruse.github.io/alg_dp_project/)
 
 The code for this project is written in Python, and the scripts `dp.py`, `dp_bonus_1.py`, and `dp_bonus_2.py` make up the main code for the Pairwise Alignment of 2 DNA sequences. 
 

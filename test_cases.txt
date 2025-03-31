@@ -1,17 +1,42 @@
-    dna_sequence_1 = ["A", "C", "G", "T"]
-    dna_sequence_2 = ["A", "C", "G", "C"]
+    dna_sequence_1 = "ACGT"
+    dna_sequence_2 = "ACGC"
 
-    dna_sequence_1 = ["C", "A", "C", "G", "T"]
-    dna_sequence_2 = ["A", "C", "C", "C"]
+    dna_sequence_1 = "CACGT"
+    dna_sequence_2 = "ACCC"
 
-    dna_sequence_1 = ["C", "A", "C", "G"]
-    dna_sequence_2 = ["T", "G", "A", "C", "C"]
+    dna_sequence_1 = "CACG"
+    dna_sequence_2 = "TGACC"
 
-    dna_sequence_1 = ["C", "A", "T", "G"]
-    dna_sequence_2 = ["C", "A", "G"]
+    dna_sequence_1 = "CATG"
+    dna_sequence_2 = "CAG"
 
-    dna_sequence_1 = ["C", "A", "C", "G", "C", "G"]
-    dna_sequence_2 = ["T", "C", "A", "C", "C", "G"]
+    dna_sequence_1 = "CACGCG"
+    dna_sequence_2 = "TCACCG"
 
-    dna_sequence_1 = ["C", "A", "C", "G", "C", "G"]
-    dna_sequence_2 = ["C", "A", "C", "C", "G"]
+    dna_sequence_1 = "CACGCG"
+    dna_sequence_2 = "CACCG"
+
+    dna_sequence_1 = "ACGTTGAC"
+    dna_sequence_2 = "ATTAC"
+
+    dna_sequence_1 = "CGATTGAC"
+    dna_sequence_2 = "ATTAC"
+
+    dna_sequence_1 = "ATTGACCG"
+    dna_sequence_2 = "ATTAC"
+
+    dna_sequence_1 = "AGTAC"
+    dna_sequence_2 = "TACGA"
+
+    Bonus 2 cannot handle empty sequence, need to check AFG
+    dna_sequence_1 = ""
+    dna_sequence_2 = "ACGT"
+
+    dna_sequence_1 = "AAAA"
+    dna_sequence_2 = "TTTT"
+
+    dna_sequence_1 = "ACGT" * 2
+    dna_sequence_2 = "TGCA" * 2
+
+    dna_sequence_1 = "AGCTAGCTAG"
+    dna_sequence_2 = "TGCAAGCTTG"

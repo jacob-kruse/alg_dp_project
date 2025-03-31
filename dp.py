@@ -6,15 +6,15 @@ import numpy as np
 def main():
 
     # Values to send to the Class
-    delta = 4
+    delta = 3
     pair_score = 10
-    non_pair_score = 0
+    non_pair_score = 7
     sigma = np.asarray([[pair_score, non_pair_score, non_pair_score, non_pair_score],
                         [non_pair_score, pair_score, non_pair_score, non_pair_score],
                         [non_pair_score, non_pair_score, pair_score, non_pair_score],
                         [non_pair_score, non_pair_score, non_pair_score, pair_score]])
-    dna_sequence_1 = ["C", "A", "C", "G", "C", "G"]
-    dna_sequence_2 = ["T", "C", "A", "C", "C", "G"]
+    dna_sequence_1 = "CACGCG"
+    dna_sequence_2 = "CACCG"
     
     # Instantiate the Class with the variables from above
     pairwise_alignment = PairwiseAlignment(sigma, delta, dna_sequence_1, dna_sequence_2)
@@ -24,12 +24,14 @@ def main():
 
     # Print the inputs and outputs
     print("\033[1mInputs\033[0m")
-    print(f"DNA Sequence 1: {''.join(dna_sequence_1)}")
-    print(f"DNA Sequence 2: {''.join(dna_sequence_2)}")
+    print(f"DNA Sequence 1: {dna_sequence_1}")
+    print(f"DNA Sequence 2: {dna_sequence_2}")
     print(f"Delta: {delta}")
     print(f"Sigma:")
-    for row in sigma:
-        print(" ".join(f"{val:3}" for val in row))
+    labels = ['A', 'C', 'G', 'T']
+    print("    " + " ".join(f"\033[1m{label:3}\033[0m" for label in labels))
+    for label, row in zip(labels, sigma):
+        print(f"\033[1m{label}\033[0m " + " ".join(f"{val:3}" for val in row))
     print("\n")
     print(f"\033[1mPairwise Alignment\033[0m\n{optimal_alignment}\n")
     print(f"\033[1mPairwise Alignment Score\033[0m\n{optimal_score}\n")
@@ -45,8 +47,12 @@ class PairwiseAlignment():
         
         self.delta = delta
         self.sigma_array = sigma_array
-        self.dna_sequence_1 = dna_sequence_1
-        self.dna_sequence_2 = dna_sequence_2
+        self.dna_sequence_1 = []
+        for term in dna_sequence_1:
+            self.dna_sequence_1.append(term)
+        self.dna_sequence_2 = []
+        for term in dna_sequence_2:
+            self.dna_sequence_2.append(term)
 
 
     def pairwise_alignment(self):
